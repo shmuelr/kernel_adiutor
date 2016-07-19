@@ -963,7 +963,7 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                 CPU.activateCpuBoostWakeup(checked, getActivity());
             else if (dSwitchCard == mCpuInputBoostEnableCard) {
                 CPU.activateCpuInputBoost(checked, getActivity());
-                ForceRefresh();
+                forceRefresh();
             }
             else if (dSwitchCard == mCpuBoostHotplugCard)
                 CPU.activateCpuBoostHotplug(checked, getActivity());
@@ -971,15 +971,15 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                 CPU.activateCpuTouchBoost(checked, getActivity());
             else if (dSwitchCard == mMSM_Limiter_EnableCard) {
                 CPU.activateMSM_Limiter(checked, getActivity());
-                ForceRefresh();
+                forceRefresh();
             }
             else if (dSwitchCard == mPerCoreControlCard) {
                 CPU.activatePerCoreControl(checked, getActivity());
-                ForceRefresh();
+                forceRefresh();
             }
         }
 
-        private void ForceRefresh() {
+        private void forceRefresh() {
             try {
                 Thread.sleep(250);
             } catch (InterruptedException ignored) {
