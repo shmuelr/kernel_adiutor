@@ -60,7 +60,7 @@ public class ProfileTileReceiver extends BroadcastReceiver {
                 return;
             }
             RootUtils.closeSU();
-            RootUtils.SU su = new RootUtils.SU();
+            RootUtils.SU su = RootUtils.getSU();
             for (String command : commands) {
                 su.runCommand(command);
                 Log.i(Constants.TAG + ": " + getClass().getSimpleName(), "Run: " + command);

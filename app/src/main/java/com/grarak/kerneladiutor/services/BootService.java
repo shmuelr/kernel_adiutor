@@ -168,7 +168,7 @@ public class BootService extends Service {
             return;
         }
 
-        RootUtils.SU su = new RootUtils.SU();
+        RootUtils.SU su = RootUtils.getSU();
         String[] writePermission = {Constants.LMK_MINFREE};
         for (String file : writePermission)
             su.runCommand("chmod 644 " + file);

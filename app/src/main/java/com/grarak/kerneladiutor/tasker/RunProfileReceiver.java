@@ -55,7 +55,7 @@ public class RunProfileReceiver extends BroadcastReceiver {
                 Utils.toast(context.getString(R.string.applying_profile, cs[0]), context, Toast.LENGTH_LONG);
 
                 if (cs.length > 1) {
-                    RootUtils.SU su = new RootUtils.SU();
+                    RootUtils.SU su = RootUtils.getSU();
                     for (int i = 1; i < cs.length; i++) {
                         Log.i(Constants.TAG + ": " + getClass().getSimpleName(), "Run: " + cs[i]);
                         su.runCommand(cs[i]);

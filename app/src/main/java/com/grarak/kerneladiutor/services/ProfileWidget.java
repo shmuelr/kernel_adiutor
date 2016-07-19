@@ -93,7 +93,7 @@ public class ProfileWidget extends AppWidgetProvider {
                 int position = intent.getIntExtra(ITEM_ARG, 0);
                 ProfileDB profileDB = new ProfileDB(context);
                 ProfileDB.ProfileItem profileItem = profileDB.getAllProfiles().get(position);
-                RootUtils.SU su = new RootUtils.SU();
+                RootUtils.SU su = RootUtils.getSU();
 
                 List<String> paths = profileItem.getPath();
                 for (int i = 0; i < paths.size(); i++) {

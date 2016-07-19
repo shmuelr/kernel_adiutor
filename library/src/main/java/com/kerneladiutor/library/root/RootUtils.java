@@ -91,9 +91,12 @@ public class RootUtils {
         return getSU().runCommand(command);
     }
 
-    private static SU getSU() {
-        if (su == null) su = new SU();
-        else if (su.closed || su.denied) su = new SU();
+    public static SU getSU() {
+        if (su == null){
+            su = new SU();
+        } else if (su.closed || su.denied){
+            su.initSU();
+        }
         return su;
     }
 
@@ -101,38 +104,54 @@ public class RootUtils {
      * Based on AndreiLux's SU code in Synapse
      * https://github.com/AndreiLux/Synapse/blob/master/src/main/java/com/af/synapse/utils/Utils.java#L238
      */
-    public static class SU {
+    public static final class SU {
 
         private Process process;
         private BufferedWriter bufferedWriter;
         private BufferedReader bufferedReader;
-        private final boolean root;
+
         private boolean closed;
         private boolean denied;
         private boolean firstTry;
 
-        public SU() {
-            this(true);
+        private final StringBuilder stringBuilder = new StringBuilder();
+
+        private SU() {
+            this(false);
         }
 
-        public SU(boolean root) {
-            this.root = root;
-            try {
-                Log.i(Tools.TAG, root ? "SU initialized" : "SH initialized");
-                firstTry = true;
-                process = Runtime.getRuntime().exec(root ? "su" : "sh");
-                bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            } catch (IOException e) {
-                Log.e(Tools.TAG, root ? "Failed to run shell as su" : "Failed to run shell as sh");
-                denied = true;
-                closed = true;
+        private SU(boolean runInit){
+            if(runInit){
+                initSU();
             }
         }
 
-        public synchronized String runCommand(final String command) {
+        private boolean initSU(){
             try {
-                StringBuilder sb = new StringBuilder();
+                Log.i(Tools.TAG, "SU initialized");
+                firstTry = true;
+                process = Runtime.getRuntime().exec("su");
+                bufferedWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+                bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                denied = false;
+                closed = false;
+            } catch (IOException e) {
+                Log.e(Tools.TAG,"Failed to run shell as su");
+                denied = true;
+                closed = true;
+            }
+
+            return !denied && !closed;
+        }
+
+        public synchronized String runCommand(final String command) {
+            if(bufferedWriter == null || bufferedReader == null){
+                initSU();
+            }
+
+            stringBuilder.setLength(0);
+
+            try {
                 String callback = "/shellCallback/";
                 bufferedWriter.write(command + "\necho " + callback + "\n");
                 bufferedWriter.flush();
@@ -140,14 +159,14 @@ public class RootUtils {
                 int i;
                 char[] buffer = new char[256];
                 while (true) {
-                    sb.append(buffer, 0, bufferedReader.read(buffer));
-                    if ((i = sb.indexOf(callback)) > -1) {
-                        sb.delete(i, i + callback.length());
+                    stringBuilder.append(buffer, 0, bufferedReader.read(buffer));
+                    if ((i = stringBuilder.indexOf(callback)) > -1) {
+                        stringBuilder.delete(i, i + callback.length());
                         break;
                     }
                 }
                 firstTry = false;
-                return sb.toString().trim();
+                return stringBuilder.toString().trim();
             } catch (IOException e) {
                 closed = true;
                 e.printStackTrace();
@@ -163,13 +182,19 @@ public class RootUtils {
 
         public void close() {
             try {
+                bufferedReader.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+            try {
                 bufferedWriter.write("exit\n");
                 bufferedWriter.flush();
+                bufferedWriter.close();
 
-                process.waitFor();
-                Log.i(Tools.TAG, root ? "SU closed: " + process.exitValue() : "SH closed: " + process.exitValue());
+                Log.i(Tools.TAG, "SU closed: " + process.exitValue());
                 closed = true;
-            } catch (Exception e) {
+            } catch (Exception e){
                 e.printStackTrace();
             }
         }

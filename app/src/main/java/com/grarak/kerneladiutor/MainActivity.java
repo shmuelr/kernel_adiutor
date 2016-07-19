@@ -482,7 +482,7 @@ public class MainActivity extends BaseActivity implements Constants {
     @Override
     public void onBackPressed() {
         try {
-            if (!VISIBLE_ITEMS.get(cur_position).getFragment().onBackPressed())
+            if (!VISIBLE_ITEMS.get(cur_position).getFragment().onBackPressed()){
                 if (mDrawerLayout == null || !mDrawerLayout.isDrawerOpen(mScrimInsetsFrameLayout)) {
                     if (pressAgain) {
                         Utils.toast(getString(R.string.press_back_again), this);
@@ -493,20 +493,25 @@ public class MainActivity extends BaseActivity implements Constants {
                                 pressAgain = true;
                             }
                         }, 2000);
-                    } else super.onBackPressed();
-                } else mDrawerLayout.closeDrawer(mScrimInsetsFrameLayout);
+                    } else {
+                        super.onBackPressed();
+                    }
+                } else {
+                    mDrawerLayout.closeDrawer(mScrimInsetsFrameLayout);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * Exit SU
+     * close SU
      */
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
         RootUtils.closeSU();
-        super.onDestroy();
+        super.onPause();
     }
 
     /**

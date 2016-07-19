@@ -117,7 +117,7 @@ public class Tools {
     public static String readFile(String file, boolean asRoot) {
         if (asRoot) return new RootFile(file).readFile();
 
-        StringBuilder s = null;
+        StringBuilder s = new StringBuilder();
         FileReader fileReader = null;
         BufferedReader buf = null;
         try {
@@ -125,7 +125,6 @@ public class Tools {
             buf = new BufferedReader(fileReader);
 
             String line;
-            s = new StringBuilder();
             while ((line = buf.readLine()) != null) s.append(line).append("\n");
         } catch (FileNotFoundException ignored) {
             Log.e(TAG, "File does not exist " + file);
@@ -139,7 +138,7 @@ public class Tools {
                 e.printStackTrace();
             }
         }
-        return s == null ? null : s.toString().trim();
+        return s.toString().trim();
     }
 
 }
